@@ -15,5 +15,7 @@ const port = process.env.PORT || config.get("port");
 const server = app.listen(port, () =>
   winston.info(`Listening on port ${port}...`)
 );
-
+app.get("/", function (req, res) {
+  res.send("Hello World by social awareness");
+});
 module.exports = server;

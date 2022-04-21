@@ -1,13 +1,20 @@
-const config = require("config");
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
-const mongoose = require("mongoose");
+const config = require('config');
+const jwt = require('jsonwebtoken');
 
+const Joi = require('joi');
+const mongoose = require('mongoose');
+// Schema deinition: defines how a schema look like
 const userSchema = new mongoose.Schema({
-  name: {
+  fullName: {
     type: String,
     required: true,
-    minlength: 2,
+    minlength: 5,
+    maxlength: 50
+  },
+  userName: {
+    type: String,
+    required: true,
+    minlength: 5,
     maxlength: 50
   },
   email: {
@@ -23,39 +30,38 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1024
   },
+  phone: {
+    type: Number,
+    required: true,
+    minlength: 9,
+    maxlength: 15
+  },
+  homeTown: {
+    type: String,
+    required: true,
+    minlength: 9,
+    maxlength: 15
+  },
   isAdmin: Boolean
 });
 
-userSchema.methods.generateAuthToken = function() {
-  const token = jwt.sign(
-    {
-      _id: this._id,
-      name: this.name,
-      email: this.email,
-      isAdmin: this.isAdmin
-    },
-    config.get("jwtPrivateKey")
-  );
+// Dont worry about this
+userSchema.methods.generateAuthToken = function () {
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, config.get('jwtPrivateKey'));
   return token;
-};
 
-const User = mongoose.model("User", userSchema);
+}
+
+const User = mongoose.model('User', userSchema);
 
 function validateUser(user) {
   const schema = {
-    name: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    email: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
-      .email(),
-    password: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
+    fullName: Joi.string().min(5).max(50).required(),
+    userName: Joi.string().min(5).max(50).required(),
+    email: Joi.string().min(5).max(50).required().email(),
+    password: Joi.string().min(5).max(255).required(),
+    phone: Joi.number().required(),
+    homeTown: Joi.string().min(5).max(50).required(),
   };
 
   return Joi.validate(user, schema);
