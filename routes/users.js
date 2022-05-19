@@ -11,19 +11,16 @@ const express = require("express");
 const router = express.Router();
 
 //3. These are all the routes
-
 router.post("/", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   // Checking email : Email should be unique
   let user = await User.findOne({ email: req.body.email });
   if (user) return res.status(400).send("User already registered");
-
   user = new User(_.pick(req.body, ["fullName", "userName", "email", "password", "phone", "homeTown"]));
-
-  console.log(user);
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
+  user.isAdmin = false;
   await user.save();
   // Send the response back to the user
   const token = user.generateAuthToken();
@@ -33,6 +30,12 @@ router.post("/", async (req, res) => {
 
 router.get("/test", async (req, res) => {
   console.log(process.pid);
+});
+
+
+router.get("/", async (req, res) => {
+  const users = await User.find().select("-__v").sort("name");
+  res.send(users);
 });
 
 // 4. Finally we need to export this router
