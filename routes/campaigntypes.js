@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     let uniqueCampaign = await Campaigntype.findOne({ name: req.body.name });
-    if (uniqueCampaign) return res.status(400).send("Campaign type already exists.");
+    if (uniqueCampaign) return res.status(400).send("Campaign type already existss.");
 
     let campaigntype = new Campaigntype({ name: req.body.name });
     campaigntype = await campaigntype.save();
