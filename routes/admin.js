@@ -14,9 +14,10 @@ router.post("/login", async (req, res) => {
     let user = await User.findOne({ email: req.body.username });
     let userPhone = await User.findOne({ phone: req.body.phone });
     let isAdmin = user.isAdmin;
+    let isAdminPhone = userPhone.isAdmin;
     console.log(isAdmin);
     if (!user || !userPhone) return res.status(400).send("User Not Registered");
-    if (!isAdmin) return res.status(400).send("User is not an admin");
+    if (!isAdmin || !isAdminPhone) return res.status(400).send("User is not an admin");
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) return res.status(400).send("Invalid email or password");
     res.send(_.pick(user, ["_id", "name", "email", "phone", "isAdmin"]));
